@@ -318,7 +318,7 @@ include(FetchContent)
 
 FetchContent_Declare(
     taskqueue
-    GIT_REPOSITORY https://github.com/robert/taskqueue.git
+    GIT_REPOSITORY https://github.com/Zheng-Bote/cpp_task-queue.git
     GIT_TAG main
 )
 FetchContent_MakeAvailable(taskqueue)
