@@ -6,16 +6,18 @@ C++23 shared library for loading task definitions from **JSON** or **INI** confi
 [![C++23](https://img.shields.io/badge/C%2B%2B-23-blue.svg)]()
 [![CMake](https://img.shields.io/badge/CMake-3.23+-blue.svg)]()
 
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/Zheng-Bote/gh-update-checker?logo=GitHub)](https://github.com/Zheng-Bote/gh-update-checker/releases)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/Zheng-Bote/cpp_task-queue?logo=GitHub)](https://github.com/Zheng-Bote/cpp_task-queue/releases)
 
-[Report Issue](https://github.com/Zheng-Bote/gh-update-checker/issues) · [Request Feature](https://github.com/Zheng-Bote/gh-update-checker/pulls)
+[Report Issue](https://github.com/Zheng-Bote/cpp_task-queue/issues) · [Request Feature](https://github.com/Zheng-Bote/cpp_task-queue/pulls)
 
 ---
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
 **Table of Contents**
 
+- [TaskQueue Library](#taskqueue-library)
   - [Description](#description)
   - [Features](#features)
   - [Architecture](#architecture)
@@ -29,7 +31,7 @@ C++23 shared library for loading task definitions from **JSON** or **INI** confi
       - [`class WorkerQueue`](#class-workerqueue)
       - [Loader Functions](#loader-functions)
     - [C API (`include/c_api.h`)](#c-api-includec_apih)
-  - [Build & Install](#build--install)
+  - [Build \& Install](#build--install)
     - [Requirements](#requirements)
     - [Building](#building)
     - [Testing](#testing)
@@ -402,7 +404,7 @@ Copyright (c) 2026 ZHENG Robert
 
 ## Code Contributors
 
-![Contributors](https://img.shields.io/github/contributors/Zheng-Bote/gh-update-checker?color=dark-green)
+![Contributors](https://img.shields.io/github/contributors/Zheng-Bote/cpp_task-queue?color=dark-green)
 
 ---
 
