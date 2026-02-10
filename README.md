@@ -14,10 +14,8 @@ C++23 shared library for loading task definitions from **JSON** or **INI** confi
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-
 **Table of Contents**
 
-- [TaskQueue Library](#taskqueue-library)
   - [Description](#description)
   - [Features](#features)
   - [Architecture](#architecture)
@@ -31,7 +29,7 @@ C++23 shared library for loading task definitions from **JSON** or **INI** confi
       - [`class WorkerQueue`](#class-workerqueue)
       - [Loader Functions](#loader-functions)
     - [C API (`include/c_api.h`)](#c-api-includec_apih)
-  - [Build \& Install](#build--install)
+  - [Build & Install](#build--install)
     - [Requirements](#requirements)
     - [Building](#building)
     - [Testing](#testing)
