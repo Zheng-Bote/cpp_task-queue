@@ -14,6 +14,37 @@ C++23 shared library for loading task definitions from **JSON** or **INI** confi
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
+
+  - [Description](#description)
+  - [Features](#features)
+  - [Architecture](#architecture)
+    - [Component Diagram](#component-diagram)
+    - [Data Flow](#data-flow)
+  - [INI Format](#ini-format)
+  - [JSON Format](#json-format)
+  - [API Documentation](#api-documentation)
+    - [C++ API (`include/task_loader.hpp`)](#c-api-includetask_loaderhpp)
+      - [`struct Task`](#struct-task)
+      - [`class WorkerQueue`](#class-workerqueue)
+      - [Loader Functions](#loader-functions)
+    - [C API (`include/c_api.h`)](#c-api-includec_apih)
+  - [Build & Install](#build--install)
+    - [Requirements](#requirements)
+    - [Building](#building)
+    - [Testing](#testing)
+    - [Installation](#installation)
+  - [Integration](#integration)
+    - [Using `find_package` (CMake)](#using-find_package-cmake)
+    - [Using `pkg-config`](#using-pkg-config)
+    - [Using `FetchContent`](#using-fetchcontent)
+  - [Example Usage](#example-usage)
+    - [C++ Example INI-File](#c-example-ini-file)
+    - [C++ Example JSON-File](#c-example-json-file)
+- [License](#license)
+- [Author](#author)
+  - [Code Contributors](#code-contributors)
+
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ---
