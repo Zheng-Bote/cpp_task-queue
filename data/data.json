@@ -1,0 +1,85 @@
+[
+  {
+    "name": "pre_task_01",
+    "type": "pre",
+    "order": 1,
+    "input": "alpha",
+    "output": "result_alpha",
+    "attr": [
+      { "key": "owner", "value": "robert" },
+      { "key": "category", "value": "init" }
+    ]
+  },
+  {
+    "name": "pre_task_02",
+    "type": "pre",
+    "order": 2,
+    "input": "beta",
+    "output": "result_beta",
+    "attr": [{ "key": "owner", "value": "teamA" }]
+  },
+  {
+    "name": "pre_task_03",
+    "type": "pre",
+    "order": 2,
+    "input": "gamma",
+    "output": "result_gamma",
+    "attr": []
+  },
+  {
+    "name": "middle_task_01",
+    "type": "middle",
+    "order": 1,
+    "input": "m1",
+    "output": "m1_out",
+    "attr": [{ "key": "priority", "value": "low" }]
+  },
+  {
+    "name": "middle_task_02",
+    "type": "middle",
+    "order": 1,
+    "input": "m2",
+    "output": "m2_out",
+    "attr": []
+  },
+  {
+    "name": "middle_task_03",
+    "type": "middle",
+    "order": 3,
+    "input": "m3",
+    "output": "m3_out",
+    "attr": [{ "key": "flag", "value": "yes" }]
+  },
+  {
+    "name": "post_task_01",
+    "type": "post",
+    "order": 1,
+    "input": "p1",
+    "output": "p1_out",
+    "attr": []
+  },
+  {
+    "name": "post_task_02",
+    "type": "post",
+    "order": 1,
+    "input": "p2",
+    "output": "p2_out",
+    "attr": [{ "key": "mode", "value": "fast" }]
+  },
+  {
+    "name": "post_task_03",
+    "type": "post",
+    "order": 5,
+    "input": "p3",
+    "output": "p3_out",
+    "attr": []
+  },
+  {
+    "name": "post_task_04",
+    "type": "post",
+    "order": 5,
+    "input": "p4",
+    "output": "p4_out",
+    "attr": [{ "key": "owner", "value": "ops" }]
+  }
+]

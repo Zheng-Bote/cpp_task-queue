@@ -1,0 +1,214 @@
+name: C++ Quality & Security
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  codeql:
+    name: CodeQL Security Scan
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: cpp
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcurl4-openssl-dev nlohmann-json3-dev wget pipx cmake ninja-build build-essential gcc-14 g++-14 libboost-dev libboost-system-dev libboost-date-time-dev libboost-regex-dev libboost-test-dev libssl-dev libsqlite3-dev
+
+      - name: Build with CMake
+        run: |
+          cmake -S . -B build -DCMAKE_C_COMPILER=gcc-14 -DCMAKE_CXX_COMPILER=g++-14
+          cmake --build build --parallel
+
+      - name: Analyze
+        uses: github/codeql-action/analyze@v4
+
+  cppcheck:
+    name: Cppcheck Static Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Cppcheck
+        run: sudo apt-get update && sudo apt-get install -y cppcheck
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcurl4-openssl-dev nlohmann-json3-dev wget pipx cmake ninja-build build-essential gcc-14 g++-14 libboost-dev libboost-system-dev libboost-date-time-dev libboost-regex-dev libboost-test-dev libssl-dev libsqlite3-dev
+
+      - name: Configure CMake (generate compile_commands.json)
+        run: |
+          cmake -S . -B build-cppcheck -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          cp build-cppcheck/compile_commands.json .
+
+      - name: Run Cppcheck
+        shell: bash
+        run: |
+          set +e
+          cppcheck \
+            --enable=all \
+            --inconclusive \
+            --std=c++20 \
+            --project=compile_commands.json \
+            --error-exitcode=1 \
+            2> cppcheck-report.txt
+          set -e
+
+      - name: Upload Cppcheck Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: cppcheck-report
+          path: cppcheck-report.txt
+
+  cvecheck:
+    name: Generate CVE-Report
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcurl4-openssl-dev nlohmann-json3-dev wget pipx cmake ninja-build build-essential gcc-14 g++-14 libboost-dev libboost-system-dev libboost-date-time-dev libboost-regex-dev libboost-test-dev libssl-dev libsqlite3-dev
+
+      - name: Configure CMake (export compile_commands)
+        run: |
+          cmake -S . -B build \
+            -DCMAKE_C_COMPILER=gcc-14 \
+            -DCMAKE_CXX_COMPILER=g++-14 \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+
+      - name: Build project
+        run: |
+          cmake --build build --config Release
+
+      - name: Setup Python (für reuse)
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+
+      - name: Setup Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "21"
+
+      - name: Setup Node.js v24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install SBOM Tools
+        run: |
+          pip install reuse
+          # npm install -g @appthreat/atom
+          npm install -g @cyclonedx/cdxgen
+          wget https://github.com/AppThreat/atom/releases/download/v2.5.2/atom.zip
+          unzip atom.zip
+
+      - name: Prepare Output Directory
+        run: mkdir -p docs
+
+      - name: Generate SPDX SBOM
+        run: |
+          reuse spdx -o ./docs/spdx-${{ steps.version.outputs.version }}.spdx
+
+      - name: Run Atom Analysis
+        run: |
+          ./bin/atom -J-Xmx16g usages -o ./docs/app.atom --slice-outfile ./docs/atom-${{ steps.version.outputs.version }}.json -l cpp build/
+
+      - name: Generate CycloneDX SBOM (build-aware)
+        env:
+          FETCH_LICENSE: true
+          CDXGEN_COMPILE_COMMANDS_FILE: build/compile_commands.json
+          CDXGEN_DEBUG_MODE: debug
+        run: |
+          cdxgen \
+            --output ./docs/cyclonedx-${{ steps.version.outputs.version }}.json \
+            --output-format json \
+            --spec-version 1.6 \
+            -t cpp \
+            --usages-slices-file ./docs/atom-${{ steps.version.outputs.version }}.json \
+            --deep \
+            --recurse \
+            --project-name CPPAppServer \
+            --project-group net.hase-zheng \
+            --project-version ${{ steps.version.outputs.version }} \
+            --author "ZHENG Robert"
+      - name: Determine version
+        id: version
+        run: echo "version=1.0.0" >> $GITHUB_OUTPUT
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+
+      - name: Install cve-bin-tool
+        run: pipx install cve-bin-tool
+
+      - name: CVE Report
+        run: |
+          cve-bin-tool --sbom cyclonedx --sbom-file ./docs/cyclonedx-${{ steps.version.outputs.version }}.json \
+            --format json \
+            --output cve-report-${{ steps.version.outputs.version }}.json \
+            --disable-data-source OSV,EPSS \
+            --cvss 9 || true
+
+      - name: Upload CVE Report and SBOM artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: cve-report
+          path: |
+            ./cve-report-${{ steps.version.outputs.version }}.json
+            ./docs/cyclonedx-${{ steps.version.outputs.version }}.json
+            ./docs/spdx-${{ steps.version.outputs.version }}.spdx
+
+  clang_tidy:
+    name: Clang-Tidy Linting
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Clang & Tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang clang-tidy nlohmann-json3-dev \
+            libcurl4-openssl-dev wget pipx cmake ninja-build build-essential \
+            gcc-14 g++-14 libboost-dev libboost-system-dev libboost-date-time-dev \
+            libboost-regex-dev libboost-test-dev libssl-dev libsqlite3-dev
+
+      - name: Configure CMake (export compile_commands.json)
+        run: |
+          cmake -S . -B build-clangtidy \
+            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+            -DCMAKE_CXX_STANDARD=23
+          cp build-clangtidy/compile_commands.json .
+
+      - name: Run Clang-Tidy
+        run: |
+          jq -r '.[].file' build-clangtidy/compile_commands.json | sort -u | \
+          xargs clang-tidy -p build-clangtidy -quiet \
+          > clang-tidy-report.txt || true
+
+      - name: Upload Clang-Tidy Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: clang-tidy-report
+          path: clang-tidy-report.txt
